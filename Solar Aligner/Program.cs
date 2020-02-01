@@ -21,30 +21,17 @@ namespace IngameScript
 {
     partial class Program : MyGridProgram
     {
-        // This file contains your actual script.
-        //
-        // You can either keep all your code here, or you can create separate
-        // code files to make your program easier to navigate while coding.
-        //
-        // In order to add a new utility class, right-click on your project, 
-        // select 'New' then 'Add Item...'. Now find the 'Space Engineers'
-        // category under 'Visual C# Items' on the left hand side, and select
-        // 'Utility Class' in the main area. Name it in the box below, and
-        // press OK. This utility class will be merged in with your code when
-        // deploying your final script.
-        //
-        // You can also simply create a new utility class manually, you don't
-        // have to use the template if you don't want to. Just do so the first
-        // time to see what a utility class looks like.
-        // 
-        // Go to:
-        // https://github.com/malware-dev/MDK-SE/wiki/Quick-Introduction-to-Space-Engineers-Ingame-Scripts
-        //
-        // to learn more about ingame scripts.
 
-        int i;
-        IMyMotorAdvancedStator rotor;
-        List<IMyTerminalBlock> list;
+        String solarPanelsGroup = "Ciapa-Solar Panels";
+        String oxygenFarmsGroup = "Ciapa-Oxygen Farms";
+        String rotorsGroup = "Ciapa-Solar Rotors";
+
+
+
+        List<IMySolarPanel> solarPanels;
+        List<IMyMotorStator> rotors;
+        List<IMyOxygenFarm> oxygenFarms;
+
         public Program()
         {
             // The constructor, called only once every session and
@@ -58,10 +45,13 @@ namespace IngameScript
             // here, which will allow your script to run itself without a 
             // timer block.
 
-            i = 0;
-            list = new List<IMyTerminalBlock>();
             Runtime.UpdateFrequency = UpdateFrequency.Update100;
-            rotor = GridTerminalSystem.GetBlockWithName("Advanced Rotor") as IMyMotorAdvancedStator;
+
+            solarPanels = new List<IMySolarPanel>();
+            rotors = new List<IMyMotorStator>();
+            oxygenFarms = new List<IMyOxygenFarm>();
+
+            initLists();
 
         }
 
@@ -87,14 +77,46 @@ namespace IngameScript
             // 
             // The method itself is required, but the arguments above
             // can be removed if not needed.
-            i++;
-            Echo(i.ToString());
-            Echo(rotor.DisplayNameText);
-            GridTerminalSystem.GetBlocksOfType(list, block => block.CubeGrid.Equals(rotor.Top.CubeGrid));
-            Echo(list.Count.ToString());
-            foreach (IMyTerminalBlock block in list)
+        }
+
+        public void initLists()
+        {
+            IMyBlockGroup temp = GridTerminalSystem.GetBlockGroupWithName(solarPanelsGroup);
+            if (temp != null)
             {
-                Echo(block.DisplayNameText);
+                temp.GetBlocksOfType(solarPanels);
+            }
+            else
+            {
+                solarPanels.Clear();
+            }
+            temp = GridTerminalSystem.GetBlockGroupWithName(oxygenFarmsGroup);
+            if (temp != null)
+            {
+                temp.GetBlocksOfType(oxygenFarms);
+            }
+            else
+            {
+                oxygenFarms.Clear();
+            }
+            temp = GridTerminalSystem.GetBlockGroupWithName(rotorsGroup);
+            if (temp != null)
+            {
+                temp.GetBlocksOfType(rotors);
+            }
+            else
+            {
+                rotors.Clear();
+            }
+        }
+
+        public void checkLists()
+        {
+            bool majNedded = false;
+
+            if (majNedded)
+            {
+                initLists();
             }
         }
     }
