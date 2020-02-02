@@ -22,36 +22,32 @@ namespace IngameScript
     partial class Program : MyGridProgram
     {
 
-        String solarPanelsGroup = "Ciapa-Solar Panels";
-        String oxygenFarmsGroup = "Ciapa-Oxygen Farms";
-        String rotorsGroup = "Ciapa-Solar Rotors";
+
+        string solarPanelsGroup = "Ciapa-Solar Panels";
+        string oxygenFarmsGroup = "Ciapa-Oxygen Farms";
+        string rotorsGroup = "Ciapa-Solar Rotors";
 
 
 
         List<IMySolarPanel> solarPanels;
         List<IMyMotorStator> rotors;
         List<IMyOxygenFarm> oxygenFarms;
+        float oxygenProduced = 0;
+        float oxygenProducedLast;
+        float energyProduced = 0;
+        float energyProducedLast;
 
         public Program()
         {
-            // The constructor, called only once every session and
-            // always before any other method is called. Use it to
-            // initialize your script. 
-            //     
-            // The constructor is optional and can be removed if not
-            // needed.
-            // 
-            // It's recommended to set Runtime.UpdateFrequency 
-            // here, which will allow your script to run itself without a 
-            // timer block.
 
-            Runtime.UpdateFrequency = UpdateFrequency.Update100;
+            //Runtime.UpdateFrequency = UpdateFrequency.Update100;
 
             solarPanels = new List<IMySolarPanel>();
             rotors = new List<IMyMotorStator>();
             oxygenFarms = new List<IMyOxygenFarm>();
 
             initLists();
+            ProductionCalcul();
 
         }
 
@@ -77,6 +73,29 @@ namespace IngameScript
             // 
             // The method itself is required, but the arguments above
             // can be removed if not needed.
+            printLists();
+        }
+
+        public void printLists()
+        {
+            Echo("Rotors : " + rotors.Count.ToString());
+            foreach (var rotor in rotors)
+            {
+                Echo(rotor.DisplayNameText);
+            }
+
+            Echo("\nSolar Panels : " + solarPanels.Count.ToString());
+            foreach (var solar in solarPanels)
+            {
+                Echo(solar.DisplayNameText + " : " + solar.MaxOutput + "MW");
+            }
+
+            Echo("\nOxygen Farms : " + oxygenFarms.Count.ToString());
+            foreach (var oxy in oxygenFarms)
+            {
+                Echo(oxy.DisplayNameText + " : " + oxy.GetOutput() + " L");
+            }
+
         }
 
         public void initLists()
@@ -114,10 +133,32 @@ namespace IngameScript
         {
             bool majNedded = false;
 
+            // Check if the lists are valid
+
+
+
             if (majNedded)
             {
                 initLists();
             }
+        }
+
+        public void ProductionCalcul()
+        {
+            energyProducedLast = energyProduced;
+            oxygenProducedLast = oxygenProduced; 
+            energyProduced = 0;
+            oxygenProduced = 0;
+
+            foreach(var solar in solarPanels)
+            {
+                energyProduced += solar.MaxOutput;
+            }
+            foreach(var oxy in oxygenFarms)
+            {
+                oxygenProduced += oxy.GetOutput();
+            }
+
         }
     }
 }
